@@ -1,0 +1,15 @@
+FROM ubuntu:18.04
+
+RUN  apt-get update \
+  && apt-get install -y wget
+
+WORKDIR /root
+
+RUN wget http://builds.etcdevteam.com/sputnikvm-dev/v0.2.x/svmdev-linux-v0.2.0-36-46a63e0.tar.gz && \
+        tar -zxf svmdev-linux-v0.2.0-36-46a63e0.tar.gz && \
+        ls && \
+        cp svmdev /usr/bin
+
+EXPOSE 8545
+
+CMD svmdev --listen=0.0.0.0:8545

@@ -1,0 +1,26 @@
+version: '3.4'
+services:
+
+  emerald-vault:
+    image: emerald-vault
+    build:
+      dockerfile: docker/Dockerfile-vault
+      context: .
+    ports:
+      - '1920:1920' # emerald-vault server
+  
+  emerald-testrpc:
+    build:
+      dockerfile: docker/Dockerfile-sputnikvm-dev
+      context: .
+    ports:
+      - '8545:8545' # rpc server
+    depends_on:
+      - emerald-vault
+
+  emerald-explorer:
+    build:
+      dockerfile: docker/Dockerfile-explorer
+      context: .
+    ports:
+      - '3000:3000' # emerald explorer server

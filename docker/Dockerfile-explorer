@@ -1,0 +1,26 @@
+FROM node:10.11.0-alpine
+
+WORKDIR /root
+
+RUN apk update
+RUN apk add --no-cache \
+    openssh \
+    git \
+    python \
+    python-dev \
+    make \
+    build-base
+
+RUN npm install -g lerna
+
+RUN git clone https://github.com/ETCDEVTeam/emerald-explorer.git
+
+WORKDIR /root/emerald-explorer
+
+RUN lerna bootstrap
+
+RUN lerna run build --scope emerald-tool-browser --include-filtered-dependencies --stream
+
+CMD lerna run --stream start --scope emerald-tool-browser --include-filtered-dependencies
+
+EXPOSE 3000
