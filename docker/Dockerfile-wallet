@@ -1,0 +1,33 @@
+FROM ubuntu:18.04
+
+RUN  apt-get update \
+  && apt-get install -y wget \
+  && apt-get install -y libfuse-dev \
+  && apt-get install -y libgtk-3-0 \
+  && apt-get install -y libnss3-dev \
+  && apt-get install -y vim
+
+RUN apt-get install -y libasound2
+
+WORKDIR /root
+
+RUN wget http://builds.etcdevteam.com/emerald-wallet/v1.1.x/EmeraldWallet-linux-x86_64-v1.1.0+4-e682346.AppImage
+
+RUN chmod u+x EmeraldWallet-linux-x86_64-v1.1.0+4-e682346.AppImage
+
+# Emerald wallet right now doesn't support settings a custom RPC ip:port
+RUN mkdir -p /root/.config/EmeraldWallet
+RUN echo '{\n\
+	"version": 1,\n\
+	"geth": {\n\
+		"url": "http://0.0.0.0:8545",\n\
+		"type": "local"\n\
+	},\n\
+	"chain": {\n\
+		"id": 61,\n\
+		"name": "mainnet"\n\
+	},\n\
+	"terms": "v1"\n\
+}' > /root/.config/EmeraldWallet/settings.json
+
+CMD ./EmeraldWallet-linux-x86_64-v1.1.0+4-e682346.AppImage

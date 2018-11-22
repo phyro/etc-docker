@@ -1,20 +1,21 @@
 version: '3.4'
 services:
 
+  # TODO: rename images to contain etc-docker:{img}
   emerald-vault:
     image: emerald-vault
     build:
       dockerfile: ./docker/Dockerfile-vault
       context: .
     ports:
-      - '1920:1920' # emerald-vault server
+      - '0.0.0.0:1920:1920' # emerald-vault server
   
   emerald-testrpc:
     build:
       dockerfile: ./docker/Dockerfile-sputnikvm-dev
       context: .
     ports:
-      - '8545:8545' # rpc server
+      - '0.0.0.0:8545:8545' # rpc server
     depends_on:
       - emerald-vault
 
@@ -24,3 +25,20 @@ services:
       context: .
     ports:
       - '3000:3000' # emerald explorer server
+
+  # In order to allow opening Emerald Wallet inside a container
+  # we need to allow the container to access X by setting
+  # xhost +local:containerId
+  # http://wiki.ros.org/docker/Tutorials/GUI
+  emerald-wallet:
+    image: etc-docker:emerald-wallet
+    build:
+      dockerfile: ./docker/Dockerfile-wallet
+      context: .
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - '/tmp/.X11-unix:/tmp/.X11-unix'
+    depends_on:
+      - emerald-testrpc
